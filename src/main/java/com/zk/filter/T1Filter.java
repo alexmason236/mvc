@@ -1,5 +1,6 @@
 package com.zk.filter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -7,6 +8,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Slf4j
 @Component
 public class T1Filter implements HandlerInterceptor {
     @Override
@@ -22,6 +24,9 @@ public class T1Filter implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        if (ex!=null) {
+            log.error(ex.getMessage());
+        }
         System.out.println("afterCompletion");
     }
 }

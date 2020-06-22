@@ -21,9 +21,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class T1 {
 
     static final LinkedBlockingQueue<DeferredResultWrapper<HttpServletRequest>> linkedBlockingQueue = new LinkedBlockingQueue();
-    static AtomicBoolean isRun=new AtomicBoolean(false);
-    static AtomicLong count=new AtomicLong(0);
-    ExecutorService executor= Executors.newSingleThreadExecutor();
+    static AtomicBoolean isRun = new AtomicBoolean(false);
+    static AtomicLong count = new AtomicLong(0);
+    ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @RequestMapping("/t1")
     @ResponseBody
@@ -38,21 +38,36 @@ public class T1 {
 
     @RequestMapping("/fullfileT1")
     @ResponseBody
-    public String fullfileT1(){
+    public String fullfileT1() {
         if (T1.isRun.get()) return "threadpool running,do not repeat!";
         executor.execute(() -> {
             try {
                 T1.isRun.set(true);
-                while (true){
+                while (true) {
                     DeferredResultWrapper<HttpServletRequest> result = T1.linkedBlockingQueue.take();
                     DeferredResult target = result.getTarget();
                     long countInfo = T1.count.getAndIncrement();
-                        target.setResult(new CommonResponse(200,"OK "+countInfo));
+                    try {
+                        int i=1/0;
+                    }catch (Exception e){
+                        log.error(e.getMessage());
+                        target.setResult(new CommonResponse(500, e.getMessage()));
+                    }
+//                    target.setResult(new CommonResponse(200, "OK " + countInfo));
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         });
-        return "处理线程开启成功";
+        return "executor run success";
     }
+
+    @RequestMapping("/exception")
+    @ResponseBody
+    public String t1Exception(){
+        int i=1/0;
+        return "ex";
+    }
+
+
 }
